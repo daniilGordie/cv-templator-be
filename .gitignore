@@ -1,0 +1,10 @@
+# Node modules
+node_modules/
+
+# TypeScript output
+dist/
+
+.vscode/
+*.log
+
+.env
