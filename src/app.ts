@@ -1,31 +1,31 @@
-import createError from 'http-errors';
-import express, { Request, Response, NextFunction } from 'express';
+import express, { NextFunction, Request, Response } from "express";
+import { templateRouter } from "./template/template.controller";
+import dotenv from "dotenv";
+import path from "path";
 import { poolPromise } from "./db";
-import path from 'path';
-import cookieParser from 'cookie-parser';
-import logger from 'morgan';
 
-import indexRouter from './routes/index';
-import usersRouter from './routes/users';
+dotenv.config();
 
 const app = express();
 
-// view engine
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+app.set("views", path.join(__dirname, "/src/views"));
+app.set("view engine", "pug");
 
-// middleware
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+async function main() {
+  app.use(express.json());
 
-// routes
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+  app.use("/api/templates", templateRouter);
 
-poolPromise.then(pool => {
+  app.get("/template", (req: Request, res: Response) => {
+    res.render("template", {
+      template: {
+        title: "Title",
+        description: "Description",
+      },
+    });
+  });
+
+  poolPromise.then(pool => {
   if (pool) {
     pool.request()
       .query("SELECT 1 AS test")
@@ -34,17 +34,24 @@ poolPromise.then(pool => {
   }
 });
 
-// 404
-app.use((req: Request, res: Response, next: NextFunction) => {
-  next(createError(404));
-});
+  app.all("*", (req: Request, res: Response) => {
+    res.status(404).json({
+      message: "Not  found",
+    });
+  });
 
-// error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  res.status(err.status || 500);
-  res.render('error');
-});
+  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error(err.stack);
+    res.status(500).send("Something gets wrong");
+  });
+
+  app.listen(process.env.PORT || 3000, () => {
+    console.log("Server is running on port 3000");
+  });
+}
+
+main();
 
 export default app;
+
+
