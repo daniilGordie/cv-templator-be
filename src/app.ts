@@ -1,5 +1,6 @@
 import createError from 'http-errors';
 import express, { Request, Response, NextFunction } from 'express';
+import { poolPromise } from "./db";
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
@@ -23,6 +24,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 // routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+poolPromise.then(pool => {
+  if (pool) {
+    pool.request()
+      .query("SELECT 1 AS test")
+      .then(result => console.log("DB test query result:", result.recordset))
+      .catch(err => console.error("DB test query failed", err));
+  }
+});
 
 // 404
 app.use((req: Request, res: Response, next: NextFunction) => {

@@ -12,6 +12,7 @@
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
+    "mssql": "^11.0.1",
     "pug": "^3.0.3"
   },
   "devDependencies": {
@@ -19,6 +20,7 @@
     "@types/debug": "^4.1.12",
     "@types/express": "^5.0.3",
     "@types/morgan": "^1.9.10",
+    "@types/mssql": "^9.1.8",
     "@types/node": "^24.5.2",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
