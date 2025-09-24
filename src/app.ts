@@ -1,38 +1,18 @@
 import express, { NextFunction, Request, Response } from "express";
-import { templateRouter } from "./template/template.controller";
 import dotenv from "dotenv";
-import path from "path";
-import { poolPromise } from "./db";
+import { PrismaClient } from "@prisma/client";
+import routes from "./routes";
 
 dotenv.config();
 
 const app = express();
+export const prisma = new PrismaClient();
 
-app.set("views", path.join(__dirname, "/src/views"));
-app.set("view engine", "pug");
 
 async function main() {
   app.use(express.json());
 
-  app.use("/api/templates", templateRouter);
-
-  app.get("/template", (req: Request, res: Response) => {
-    res.render("template", {
-      template: {
-        title: "Title",
-        description: "Description",
-      },
-    });
-  });
-
-  poolPromise.then(pool => {
-  if (pool) {
-    pool.request()
-      .query("SELECT 1 AS test")
-      .then(result => console.log("DB test query result:", result.recordset))
-      .catch(err => console.error("DB test query failed", err));
-  }
-});
+  app.use("/api", routes);
 
   app.all("*", (req: Request, res: Response) => {
     res.status(404).json({
@@ -50,7 +30,15 @@ async function main() {
   });
 }
 
-main();
+main()
+    .then(async () => {
+        await prisma.$connect()
+    })
+    .catch(async e => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    })
 
 export default app;
 
