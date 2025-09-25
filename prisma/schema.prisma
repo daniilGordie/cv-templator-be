@@ -7,39 +7,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Template {
-  id           String   @id @default(cuid())
-  title        String
-  description  String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-}
-
-model Role {
-  id          Int        @id @default(autoincrement())
-  name        String
-  description String?
-
-  users       UserRole[]
-}
-
-model UserRole {
-  userId Int
-  roleId Int
-
-  user User @relation(fields: [userId], references: [id])
-  role Role @relation(fields: [roleId], references: [id])
-
-  @@id([userId, roleId]) 
-}
-
 model User {
-  id           Int        @id @default(autoincrement())
-  email        String     @unique
-  passwordHash String
-  createdAt    DateTime   @default(now())
-  isActive     Boolean    @default(true)
+  id        String    @id @default(cuid())
 
-  roles        UserRole[]
+  email     String    @unique
+  password  String
+  fullName  String
+
+  resumes   Resume[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
+model Resume {
+  id         String     @id @default(cuid())
+
+  name       String
+
+  user       User       @relation(fields: [userId], references: [id])
+  userId     String
+
+  sections   Section[]  @relation(name: "ResumeToSections")
+  template   Template   @relation(fields: [templateId], references: [id])
+  templateId String
+
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Section {
+  id        String    @id @default(cuid())
+
+  name      String
+
+  resume    Resume    @relation(name: "ResumeToSections", fields: [resumeId], references: [id])
+  resumeId  String
+  entries   Entry[]   @relation(name: "SectionsToEntries")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Entry {
+  id          String   @id @default(cuid())
+
+  title       String
+  description String
+  startDate   DateTime?
+  endDate     DateTime?
+
+  section     Section  @relation(name: "SectionsToEntries", fields: [sectionId], references: [id])
+  sectionId   String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Template {
+  id        String     @id @default(cuid())
+
+  name      String
+  style     String
+
+  resume    Resume[]
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
