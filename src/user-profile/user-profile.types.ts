@@ -1,7 +1,7 @@
-import { Resume } from "@prisma/client"
+  import { Resume } from "@prisma/client"
 
-export interface IUserProfile {
-  fullName: string
-  email: string
-  resume: Resume[]
-}
+  export interface IUserProfile {
+    email: string
+    password: string
+    resume: Resume[]
+  }

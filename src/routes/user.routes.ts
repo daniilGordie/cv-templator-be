@@ -1,15 +1,17 @@
 import { Router, Request, Response } from "express";
 import { createUserDto } from "@/common/user.dto";
-import { updateUserProfileDto } from "@/user-profile/user-profile.dto";
 import { UserService } from "@/common/user.service";
 import { UserProfileService } from "@/user-profile/user-profile.service";
 import { UserResumeService } from "@/user-resume/user-resume.service";
 import { requireParam } from "@/middlewares/validateParams";
+import { updatePersonalInfoDto } from "@/personal-info/personal-info.dto";
+import { PersonalInfoService } from "@/personal-info/personal-info.service";
 
 const router = Router();
 const userService = new UserService();
 const userProfileService = new UserProfileService();
 const userResumeService = new UserResumeService();
+const personalInfoService = new PersonalInfoService();
 
 router.use("/:userId", requireParam("userId"))
 
@@ -35,23 +37,6 @@ router.post("/create-user", async (req: Request, res: Response) => {
   res.status(201).json(user);
 });
 
-router.put("/:userId", async (req: Request, res: Response) => {
-  
-  const userId = req.params.userId as string;
-  
-  const validation = updateUserProfileDto.safeParse(req.body);
-  
-  if (!validation.success) {
-    return res.status(400).json({ message: validation.error.message });
-  }
-  
-  const updated = await userProfileService.updateMyProfile(userId, req.body);
-  
-  if (!updated) return res.status(404).json({ message: "User not found" });
-  
-  res.json(updated);
-});
-
 router.delete("/:userId", async (req: Request, res: Response) => {
   
   const userId = req.params.userId as string;
@@ -61,6 +46,23 @@ router.delete("/:userId", async (req: Request, res: Response) => {
   if (!deleted) return res.status(404).json({ message: "User not found" });
   
   res.json(deleted);
+});
+
+router.put("/:userId/update-personal-info", async (req: Request, res: Response) => {
+  
+  const userId = req.params.userId as string;
+  
+  const validation = updatePersonalInfoDto.safeParse(req.body);
+  
+  if (!validation.success) {
+    return res.status(400).json({ message: validation.error.message });
+  }
+  
+  const info = await personalInfoService.updatePersonalInfo(userId, req.body);
+  
+  if (!info) return res.status(404).json({ message: "Resume not found" });
+  
+  res.json(info);
 });
 
 router.get("/:userId/resumes", async (req: Request, res: Response) => {

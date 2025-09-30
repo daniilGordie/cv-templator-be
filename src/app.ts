@@ -2,15 +2,22 @@ import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import routes from "./routes";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
 export const prisma = new PrismaClient();
 
-
 async function main() {
   app.use(express.json());
+
+  app.use(
+    cors({
+      origin: "http://localhost:4200",
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    })
+  );
 
   app.use("/api", routes);
 
@@ -31,15 +38,13 @@ async function main() {
 }
 
 main()
-    .then(async () => {
-        await prisma.$connect()
-    })
-    .catch(async e => {
-        console.error(e)
-        await prisma.$disconnect()
-        process.exit(1)
-    })
+  .then(async () => {
+    await prisma.$connect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
 
 export default app;
-
-

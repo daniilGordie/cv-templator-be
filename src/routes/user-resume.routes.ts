@@ -16,6 +16,8 @@ router.get("/:resumeId", requireParam("resumeId"), async (req: Request, res: Res
   res.json(resume);
 });
 
+
+
 router.put("/update-general-info/:resumeId", requireParam("resumeId"), async (req: Request, res: Response) => {
   
   const resumeId = req.params.resumeId as string;

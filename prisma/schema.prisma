@@ -8,19 +8,32 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
+  id            String    @id @default(cuid())
 
-  email     String    @unique
-  password  String
-  fullName  String
+  email         String    @unique
+  password      String
 
-  resumes   Resume[]
+  personalInfo  PersonalInfo?  @relation(name: "PersonalInfoToUser")
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  resume        Resume[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
-model Resume {
+model PersonalInfo {
+  id            String    @id @default(cuid())
+  firstName     String
+  secondName    String?
+  phoneNumber   String?
+  homeTown      String?
+  dateOfBirth   DateTime
+
+  user        User?     @relation(name: "PersonalInfoToUser", fields: [userId], references: [id], onDelete: NoAction)
+  userId      String?   @unique
+}
+
+ model Resume {
   id         String     @id @default(cuid())
 
   name       String

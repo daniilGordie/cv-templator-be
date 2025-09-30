@@ -1,5 +1,5 @@
-import { Resume } from "@prisma/client";
-import { IResume } from "./user-resume.types";
+import { Resume } from '@prisma/client';
+import { IResume } from './user-resume.types';
 import { prisma } from "@/app";
 
 export class UserResumeService {
